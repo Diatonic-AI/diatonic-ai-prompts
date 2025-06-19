@@ -50,7 +50,7 @@ twitter_username: diatonic_ai
 navigation:
   - title: "Home"
     url: "/"
-  - title: "All Prompts"
+  - title: "Prompts"
     url: "/prompts/"
   - title: "Categories"
     url: "/categories/"

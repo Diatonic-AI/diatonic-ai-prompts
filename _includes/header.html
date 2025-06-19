@@ -3,8 +3,8 @@
         <nav class="navbar">
             <!-- Logo/Brand -->
             <div class="navbar-brand">
-                <a href="/" class="brand-link">
-                    <img src="/assets/images/logo.png" alt="{{ site.title }}" class="brand-logo">
+                <a href="{{ '/' | relative_url }}" class="brand-link">
+                    <span class="brand-icon">🤖</span>
                     <span class="brand-text">{{ site.title }}</span>
                 </a>
             </div>
@@ -19,27 +19,16 @@
             <!-- Navigation Links -->
             <div class="navbar-nav" id="navbar-nav">
                 {% for nav_item in site.navigation %}
-                    <a href="{{ nav_item.url }}" class="nav-link {% if page.url == nav_item.url %}active{% endif %}">
+                    <a href="{{ nav_item.url | relative_url }}" class="nav-link {% if page.url == nav_item.url %}active{% endif %}">
                         {{ nav_item.title }}
                     </a>
                 {% endfor %}
             </div>
 
-            <!-- Search -->
-            <div class="navbar-search">
-                <div class="search-container">
-                    <input type="text" class="search-input" id="search-input" placeholder="Search prompts..." aria-label="Search prompts">
-                    <button class="search-btn" id="search-btn" aria-label="Search">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                <div class="search-results" id="search-results"></div>
-            </div>
-
             <!-- CTA Button -->
             <div class="navbar-cta">
                 <a href="https://diatonic-ai.com" class="cta-btn" target="_blank" rel="noopener">
-                    Discover Diatonic AI
+                    Visit Diatonic AI
                     <i class="fas fa-external-link-alt"></i>
                 </a>
             </div>
