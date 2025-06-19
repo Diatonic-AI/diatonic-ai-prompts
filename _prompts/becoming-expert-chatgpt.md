@@ -1,9 +1,12 @@
 ---
-title: "Becoming An Expert In ChatGPT"
-description: "ChatGPT is like a personal DJ, but instead of playing music, it spins words like a pro! With its ability to generate human-like text, it's the perfect companion for anyone looking to enhance their writing, creativity, and productivity."
+title: "👨‍💻Becoming An Expert In ChatGPT"
+description: "ChatGPT is like a personal DJ, but instead of playing music, it spins words like a pro! With ChatGPT's language skills, you'll be able to craft the perfect sentence, write a killer proposal and even analyze your competition like a boss. It's like having your own personal Snoop Dogg, but instead of rapping, it's typing, and instead of saying 'fo shizzle' it's saying 'excellent work!'"
 icon: "👨‍💻"
-categories: ["Business", "Marketing"]
+categories: ["Business"]
+pack: "Business Pack 💸"
+pack_slug: "business-pack"
 featured: true
+slug: "prc_ultimate-chatgpt-business-prompt-pack-nwd70s6z"
 prompts:
   - text: |
       Create a guide for mastering ChatGPT, including a variety of resources, strategies, and a personalized learning path. Make sure to include trusted digital platforms, blogs, key figures, literature, and YouTube videos. The AI should not generate non-existent data.
