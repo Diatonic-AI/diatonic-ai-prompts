@@ -1,4 +1,4 @@
-# Sintra AI Prompts - Dynamic CMS Website
+# Diatonic AI Prompts - Dynamic CMS Website
 
 A comprehensive prompt library website built with Jekyll and GitHub Pages. This dynamic CMS allows easy management of ChatGPT prompts with identical structure across all prompt landing pages.
 
@@ -48,8 +48,8 @@ A comprehensive prompt library website built with Jekyll and GitHub Pages. This 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Diatonic-AI/sintra-ai-prompts.git
-   cd sintra-ai-prompts
+   git clone https://github.com/Diatonic-AI/diatonic-ai-prompts.git
+   cd diatonic-ai-prompts
    ```
 
 2. **Install dependencies**
@@ -63,7 +63,7 @@ A comprehensive prompt library website built with Jekyll and GitHub Pages. This 
    ```
 
 4. **Open your browser**
-   Navigate to `http://localhost:4000/sintra-ai-prompts`
+   Navigate to `http://localhost:4000/diatonic-ai-prompts`
 
 ### Adding New Prompts
 
@@ -126,7 +126,7 @@ Edit `_config.yml` to customize:
 2. **Push your code to the repository**
 3. **GitHub Pages is already enabled**
    - The site is automatically deployed via GitHub Actions
-   - Live site: https://diatonic-ai.github.io/sintra-ai-prompts
+   - Live site: https://diatonic-ai.github.io/diatonic-ai-prompts
    - Deployment happens automatically on push to main branch
 
 ### Manual Deployment
@@ -149,7 +149,7 @@ Categories are defined in `_config.yml` under the `categories` section. Each cat
 
 ### Packs
 
-Sintra Packs are defined in `_config.yml` under the `packs` section. These are collections of related prompts.
+Diatonic AI Packs are defined in `_config.yml` under the `packs` section. These are collections of related prompts.
 
 ### Featured Prompts
 

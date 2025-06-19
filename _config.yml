@@ -1,7 +1,7 @@
 # Prompt Library Website Configuration
-title: "Sintra AI Prompts"
-description: "Comprehensive collection of ChatGPT prompts for various industries and use cases"
-baseurl: "/sintra-ai-prompts"
+title: "Diatonic AI Prompts"
+description: "Comprehensive collection of AI prompts for various industries and use cases. Powered by Diatonic AI's expertise in artificial intelligence."
+baseurl: "/diatonic-ai-prompts"
 url: "https://diatonic-ai.github.io"
 
 # Build settings
