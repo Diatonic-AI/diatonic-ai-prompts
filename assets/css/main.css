@@ -481,11 +481,14 @@ a:hover {
     font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
     line-height: 1.6;
     word-wrap: break-word;
+    word-spacing: normal;
+    letter-spacing: normal;
     font-size: 0.875rem;
     white-space: normal;
     text-align: left;
     text-indent: 0;
     margin: 0;
+    overflow-wrap: break-word;
 }
 
 /* Placeholder Highlighting */
