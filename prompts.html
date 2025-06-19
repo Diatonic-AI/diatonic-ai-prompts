@@ -1,0 +1,108 @@
+---
+layout: default
+title: "All Prompts"
+description: "Browse our complete collection of ChatGPT prompts across all categories and industries. Find the perfect prompt for your needs."
+permalink: /prompts/
+---
+
+<div class="prompts-page">
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header" style="text-align: center; margin-bottom: 3rem;">
+            <h1>All Prompts</h1>
+            <p>Explore our comprehensive collection of ChatGPT prompts designed to boost your productivity and creativity.</p>
+        </header>
+
+        <!-- Category Filter -->
+        <section class="category-filter">
+            <h2>Filter by Category</h2>
+            <div class="category-grid">
+                {% for category in site.categories %}
+                    <button class="category-btn" data-category="{{ category.slug }}" {% if category.slug == 'all' %}class="active"{% endif %}>
+                        {% if category.icon %}
+                            <span class="category-icon">{{ category.icon }}</span>
+                        {% endif %}
+                        <span>{{ category.name }}</span>
+                    </button>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Prompts Grid -->
+        <section class="prompts-section">
+            <div class="prompts-grid">
+                {% for prompt in site.prompts %}
+                    <a href="{{ prompt.url }}" class="prompt-card" data-categories="{{ prompt.categories | join: ',' }}">
+                        <div class="prompt-card-header">
+                            {% if prompt.icon %}
+                                <span class="prompt-card-icon">{{ prompt.icon }}</span>
+                            {% endif %}
+                            <h3 class="prompt-card-title">{{ prompt.title }}</h3>
+                        </div>
+                        
+                        <p class="prompt-card-description">{{ prompt.description | truncate: 120 }}</p>
+                        
+                        <div class="prompt-card-footer">
+                            <div class="prompt-card-categories">
+                                {% for category in prompt.categories limit: 2 %}
+                                    <span class="category-tag">{{ category }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- No Results Message -->
+        <div id="no-results" style="display: none; text-align: center; padding: 4rem 0;">
+            <h3>No prompts found</h3>
+            <p>Try selecting a different category or browse all prompts.</p>
+            <button class="btn btn-primary category-btn" data-category="all">
+                <i class="fas fa-list"></i>
+                Show All Prompts
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced category filtering for prompts page
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const promptCards = document.querySelectorAll('.prompt-card');
+    const noResults = document.getElementById('no-results');
+    
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.dataset.category;
+            
+            // Update active state
+            categoryBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter prompt cards
+            let visibleCount = 0;
+            promptCards.forEach(card => {
+                const cardCategories = card.dataset.categories ? card.dataset.categories.split(',') : [];
+                
+                if (category === 'all' || cardCategories.includes(category)) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.3s ease';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+

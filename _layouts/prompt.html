@@ -1,0 +1,160 @@
+---
+layout: default
+---
+
+<div class="prompt-page">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/prompts/">Prompts</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ page.title }}</li>
+            </ol>
+        </nav>
+
+        <!-- Prompt Header -->
+        <header class="prompt-header">
+            <div class="prompt-title-section">
+                <h1 class="prompt-title">
+                    {% if page.icon %}
+                        <span class="prompt-icon">{{ page.icon }}</span>
+                    {% endif %}
+                    {{ page.title }}
+                </h1>
+                {% if page.categories %}
+                    <div class="prompt-categories">
+                        {% for category in page.categories %}
+                            <span class="category-tag">{{ category }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if page.description %}
+                <p class="prompt-description">{{ page.description }}</p>
+            {% endif %}
+        </header>
+
+        <!-- Prompt Instructions -->
+        <section class="prompt-instructions">
+            <h2>Prompts</h2>
+            <p class="instructions-text">Copy a prompt, replace placeholders with relevant text, and paste it at Sintra Chat in the right, bottom corner for an efficient and streamlined experience.</p>
+        </section>
+
+        <!-- Prompt Content -->
+        <div class="prompt-content">
+            {% if page.prompts %}
+                {% for prompt in page.prompts %}
+                    <div class="prompt-item">
+                        <div class="prompt-header-row">
+                            <h3 class="prompt-number">Prompt #{{ forloop.index }}</h3>
+                            <button class="copy-btn" data-prompt-id="{{ forloop.index }}" onclick="copyPrompt(this)">
+                                <i class="fas fa-copy"></i>
+                                Copy
+                            </button>
+                        </div>
+                        
+                        <div class="prompt-text" id="prompt-{{ forloop.index }}">
+                            {{ prompt.text | markdownify }}
+                        </div>
+                        
+                        {% if prompt.explanation %}
+                            <div class="prompt-explanation">
+                                <h4>Explanation and example</h4>
+                                <p>{{ prompt.explanation }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Additional Content from Page Content -->
+            {% if content %}
+                <div class="additional-content">
+                    {{ content }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Tips Section -->
+        {% if page.tips %}
+            <section class="tips-section">
+                <h2>Tips</h2>
+                <p class="tips-intro">Follow these guidelines to maximize your experience and unlock the full potential of your conversations with Sintra Chat.</p>
+                
+                <div class="tips-list">
+                    {% for tip in page.tips %}
+                        <div class="tip-item">
+                            <h4>{{ tip.title }}</h4>
+                            <p>{{ tip.description }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Related Prompts -->
+        {% if page.categories %}
+            <section class="related-prompts">
+                <h2>Related Prompts</h2>
+                <div class="related-prompts-grid">
+                    {% assign related_prompts = site.prompts | where_exp: "prompt", "prompt.categories contains page.categories.first" | where_exp: "prompt", "prompt.url != page.url" | limit: 6 %}
+                    {% for related_prompt in related_prompts %}
+                        <a href="{{ related_prompt.url }}" class="related-prompt-card">
+                            {% if related_prompt.icon %}
+                                <span class="related-prompt-icon">{{ related_prompt.icon }}</span>
+                            {% endif %}
+                            <h3>{{ related_prompt.title }}</h3>
+                            <p>{{ related_prompt.description | truncate: 100 }}</p>
+                            <div class="related-prompt-categories">
+                                {% for category in related_prompt.categories limit: 2 %}
+                                    <span class="category-tag">{{ category }}</span>
+                                {% endfor %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyPrompt(button) {
+    const promptId = button.getAttribute('data-prompt-id');
+    const promptElement = document.getElementById('prompt-' + promptId);
+    const text = promptElement.innerText;
+    
+    navigator.clipboard.writeText(text).then(function() {
+        // Change button text to indicate success
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.classList.add('copied');
+        
+        // Reset button after 2 seconds
+        setTimeout(function() {
+            button.innerHTML = originalText;
+            button.classList.remove('copied');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        // Show success message
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.classList.add('copied');
+        setTimeout(function() {
+            button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            button.classList.remove('copied');
+        }, 2000);
+    });
+}
+</script>
+

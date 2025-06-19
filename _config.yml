@@ -1,0 +1,149 @@
+# Prompt Library Website Configuration
+title: "Sintra AI Prompts"
+description: "Comprehensive collection of ChatGPT prompts for various industries and use cases"
+baseurl: ""
+url: "https://yourusername.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Collections
+collections:
+  prompts:
+    output: true
+    permalink: /:collection/:name/
+  categories:
+    output: true
+    permalink: /category/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "prompts"
+    values:
+      layout: "prompt"
+  - scope:
+      path: ""
+      type: "categories"
+    values:
+      layout: "category"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+# Site settings
+email: your-email@domain.com
+github_username: yourusername
+twitter_username: yourusername
+
+# Navigation
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "All Prompts"
+    url: "/prompts/"
+  - title: "Categories"
+    url: "/categories/"
+  - title: "Packs"
+    url: "/packs/"
+
+# Categories
+categories:
+  - name: "All"
+    slug: "all"
+  - name: "Agency"
+    slug: "agency"
+    icon: "🏌️"
+  - name: "Assistants"
+    slug: "assistants"
+    icon: "✍️"
+  - name: "Business"
+    slug: "business"
+    icon: "💸"
+  - name: "Copywriting"
+    slug: "copywriting"
+    icon: "✍🏼"
+  - name: "HR"
+    slug: "hr"
+    icon: "🤝"
+  - name: "Marketing"
+    slug: "marketing"
+    icon: "🤖"
+  - name: "Productivity"
+    slug: "productivity"
+    icon: "✔️"
+  - name: "Real Estate"
+    slug: "real-estate"
+    icon: "🏠"
+  - name: "Sales"
+    slug: "sales"
+    icon: "💰"
+  - name: "Startups"
+    slug: "startups"
+    icon: "🚀"
+  - name: "Support"
+    slug: "support"
+    icon: "💬"
+  - name: "Web Development"
+    slug: "web-development"
+    icon: "💻"
+
+# Packs
+packs:
+  - name: "Agency Pack"
+    icon: "🏌️"
+    slug: "agency-pack"
+  - name: "Assistants Pack"
+    icon: "✍️"
+    slug: "assistants-pack"
+  - name: "Business Pack"
+    icon: "💸"
+    slug: "business-pack"
+  - name: "Copywriting Pack"
+    icon: "✍🏼"
+    slug: "copywriting-pack"
+  - name: "HR Pack"
+    icon: "🤝"
+    slug: "hr-pack"
+  - name: "Marketing Pack"
+    icon: "🤖"
+    slug: "marketing-pack"
+  - name: "Productivity Pack"
+    icon: "✔️"
+    slug: "productivity-pack"
+  - name: "Real Estate Pack"
+    icon: "🏠"
+    slug: "real-estate-pack"
+  - name: "Sales Pack"
+    icon: "💰"
+    slug: "sales-pack"
+  - name: "Startups Pack"
+    icon: "🚀"
+    slug: "startups-pack"
+  - name: "Support Pack"
+    icon: "💬"
+    slug: "support-pack"
+  - name: "Web Development Pack"
+    icon: "💻"
+    slug: "web-development-pack"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+

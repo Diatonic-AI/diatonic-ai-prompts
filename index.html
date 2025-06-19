@@ -1,0 +1,140 @@
+---
+layout: default
+title: "Home"
+description: "Comprehensive collection of ChatGPT prompts for various industries and use cases. Boost your productivity with our curated prompt library."
+---
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>Sintra AI Prompts</h1>
+        <p>Comprehensive collection of ChatGPT prompts for various industries and use cases. Copy a prompt, replace placeholders with relevant text, and paste it at Sintra Chat for an efficient and streamlined experience.</p>
+        
+        <div class="hero-cta">
+            <a href="/prompts/" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+                Browse All Prompts
+            </a>
+            <a href="https://sintra.ai" class="btn btn-secondary" target="_blank" rel="noopener">
+                <i class="fas fa-external-link-alt"></i>
+                Try Sintra Chat
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Category Filter -->
+<section class="category-filter">
+    <div class="container">
+        <h2>Categories</h2>
+        <div class="category-grid">
+            {% for category in site.categories %}
+                <button class="category-btn" data-category="{{ category.slug }}" {% if category.slug == 'all' %}class="active"{% endif %}>
+                    {% if category.icon %}
+                        <span class="category-icon">{{ category.icon }}</span>
+                    {% endif %}
+                    <span>{{ category.name }}</span>
+                </button>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Prompts -->
+<section class="featured-prompts">
+    <div class="container">
+        <h2>Featured Prompts</h2>
+        <div class="prompts-grid">
+            {% assign featured_prompts = site.prompts | where: "featured", true | limit: 6 %}
+            {% if featured_prompts.size == 0 %}
+                {% assign featured_prompts = site.prompts | limit: 6 %}
+            {% endif %}
+            
+            {% for prompt in featured_prompts %}
+                <a href="{{ prompt.url }}" class="prompt-card" data-categories="{{ prompt.categories | join: ',' }}">
+                    <div class="prompt-card-header">
+                        {% if prompt.icon %}
+                            <span class="prompt-card-icon">{{ prompt.icon }}</span>
+                        {% endif %}
+                        <h3 class="prompt-card-title">{{ prompt.title }}</h3>
+                    </div>
+                    
+                    <p class="prompt-card-description">{{ prompt.description | truncate: 120 }}</p>
+                    
+                    <div class="prompt-card-footer">
+                        <div class="prompt-card-categories">
+                            {% for category in prompt.categories limit: 2 %}
+                                <span class="category-tag">{{ category }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="/prompts/" class="btn btn-primary">
+                View All Prompts
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Sintra Packs -->
+<section class="sintra-packs" style="background: var(--surface-color); padding: 4rem 0; margin-top: 4rem;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 3rem;">Sintra Packs</h2>
+        <div class="prompts-grid">
+            {% for pack in site.packs limit: 12 %}
+                <a href="/pack/{{ pack.slug }}/" class="prompt-card">
+                    <div class="prompt-card-header">
+                        <span class="prompt-card-icon">{{ pack.icon }}</span>
+                        <h3 class="prompt-card-title">{{ pack.name }}</h3>
+                    </div>
+                    
+                    <p class="prompt-card-description">Specialized prompts for {{ pack.name | downcase | replace: ' pack', '' }} professionals and use cases.</p>
+                    
+                    <div class="prompt-card-footer">
+                        <div class="prompt-card-categories">
+                            <span class="category-tag">Pack</span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Tips Section -->
+<section class="home-tips" style="padding: 4rem 0;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 3rem;">Tips for Using Prompts</h2>
+        <div class="tips-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div class="tip-item" style="background: var(--background-color); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fas fa-edit"></i>
+                    Customize Your Prompts
+                </h4>
+                <p>Replace placeholders with your specific information to get the most relevant results. The more specific you are, the better the output.</p>
+            </div>
+            
+            <div class="tip-item" style="background: var(--background-color); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fas fa-flask"></i>
+                    Experiment with Variations
+                </h4>
+                <p>Try different versions of prompts and adjust the temperature settings in ChatGPT to get varied creative outputs for your needs.</p>
+            </div>
+            
+            <div class="tip-item" style="background: var(--background-color); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">
+                    <i class="fas fa-rocket"></i>
+                    Use with Sintra Chat
+                </h4>
+                <p>Get the best results by using these prompts with Sintra Chat in the right bottom corner for an optimized AI conversation experience.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
