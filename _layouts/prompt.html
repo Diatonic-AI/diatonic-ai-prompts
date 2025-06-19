@@ -36,8 +36,17 @@ layout: default
             {% endif %}
         </header>
 
+        <!-- Page Navigation -->
+        <nav class="page-navigation">
+            <div class="page-nav-container">
+                <a href="#prompts" class="page-nav-link active">Prompts</a>
+                <a href="#tips" class="page-nav-link">Tips</a>
+                <a href="#recommendations" class="page-nav-link">Recommendations</a>
+            </div>
+        </nav>
+
         <!-- Prompt Instructions -->
-        <section class="prompt-instructions">
+        <section id="prompts" class="prompt-instructions">
             <h2>Prompts</h2>
             <p class="instructions-text">Copy a prompt, replace placeholders with relevant text, and paste it into your AI chat interface for an efficient and streamlined experience powered by Diatonic AI.</p>
         </section>
@@ -79,7 +88,7 @@ layout: default
 
         <!-- Tips Section -->
         {% if page.tips %}
-            <section class="tips-section">
+            <section id="tips" class="tips-section">
                 <h2>Tips</h2>
                 <p class="tips-intro">Follow these guidelines to maximize your experience and unlock the full potential of your AI conversations with Diatonic AI's curated prompts.</p>
                 
@@ -96,8 +105,8 @@ layout: default
 
         <!-- Related Prompts -->
         {% if page.categories %}
-            <section class="related-prompts">
-                <h2>Related Prompts</h2>
+            <section id="recommendations" class="related-prompts">
+                <h2>Recommendations</h2>
                 <div class="related-prompts-grid">
                     {% assign related_prompts = site.prompts | where_exp: "prompt", "prompt.categories contains page.categories.first" | where_exp: "prompt", "prompt.url != page.url" | limit: 6 %}
                     {% for related_prompt in related_prompts %}
@@ -155,6 +164,95 @@ function copyPrompt(button) {
             button.classList.remove('copied');
         }, 2000);
     });
+}
+
+// Page navigation functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight placeholders in prompt text
+    highlightPlaceholders();
+    
+    // Set up navigation link active states
+    setupPageNavigation();
+    
+    // Set up scroll spy for navigation
+    setupScrollSpy();
+});
+
+function highlightPlaceholders() {
+    const promptTexts = document.querySelectorAll('.prompt-text');
+    promptTexts.forEach(function(promptText) {
+        let html = promptText.innerHTML;
+        
+        // Highlight different types of placeholders with different colors
+        // [placeholder] - blue
+        html = html.replace(/\[([^\]]+)\]/g, '<span class="placeholder placeholder-blue">[$1]</span>');
+        
+        // {placeholder} - green
+        html = html.replace(/\{([^}]+)\}/g, '<span class="placeholder placeholder-green">{$1}</span>');
+        
+        // <placeholder> - orange
+        html = html.replace(/&lt;([^&]+)&gt;/g, '<span class="placeholder placeholder-orange">&lt;$1&gt;</span>');
+        
+        // {{placeholder}} - purple
+        html = html.replace(/\{\{([^}]+)\}\}/g, '<span class="placeholder placeholder-purple">{{$1}}</span>');
+        
+        // (your_placeholder) - teal
+        html = html.replace(/\(your_([^)]+)\)/g, '<span class="placeholder placeholder-teal">(your_$1)</span>');
+        
+        // [YOUR_PLACEHOLDER] - red (all caps in brackets)
+        html = html.replace(/\[([A-Z_]+)\]/g, '<span class="placeholder placeholder-red">[$1]</span>');
+        
+        promptText.innerHTML = html;
+    });
+}
+
+function setupPageNavigation() {
+    const navLinks = document.querySelectorAll('.page-nav-link');
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                // Smooth scroll to target
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                
+                // Update active state
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+}
+
+function setupScrollSpy() {
+    const sections = document.querySelectorAll('#prompts, #tips, #recommendations');
+    const navLinks = document.querySelectorAll('.page-nav-link');
+    
+    function updateActiveNav() {
+        let current = '';
+        sections.forEach(function(section) {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(function(link) {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', updateActiveNav);
+    updateActiveNav(); // Initial call
 }
 </script>
 
