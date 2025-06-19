@@ -228,10 +228,17 @@ function setupPageNavigation() {
             const targetElement = document.getElementById(targetId);
             
             if (targetElement) {
-                // Smooth scroll to target
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+                // Calculate offset for sticky headers
+                const headerHeight = document.querySelector('.site-header')?.offsetHeight || 60;
+                const navHeight = document.querySelector('.page-navigation')?.offsetHeight || 80;
+                const totalOffset = headerHeight + navHeight + 20; // Extra 20px for breathing room
+                
+                // Get target position and scroll to it with offset
+                const targetPosition = targetElement.offsetTop - totalOffset;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
                 });
                 
                 // Update active state
@@ -247,11 +254,16 @@ function setupScrollSpy() {
     const navLinks = document.querySelectorAll('.page-nav-link');
     
     function updateActiveNav() {
+        // Calculate offset for sticky headers (same as navigation function)
+        const headerHeight = document.querySelector('.site-header')?.offsetHeight || 60;
+        const navHeight = document.querySelector('.page-navigation')?.offsetHeight || 80;
+        const totalOffset = headerHeight + navHeight + 50; // Extra 50px for better detection
+        
         let current = '';
         sections.forEach(function(section) {
             const sectionTop = section.offsetTop;
             const sectionHeight = section.clientHeight;
-            if (window.pageYOffset >= sectionTop - 100) {
+            if (window.pageYOffset >= sectionTop - totalOffset) {
                 current = section.getAttribute('id');
             }
         });
