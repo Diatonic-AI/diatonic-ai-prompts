@@ -70,7 +70,7 @@ layout: default
                                 </div>
                                 
                                 <div class="prompt-text" id="prompt-{{ forloop.index }}">
-                                    {{ prompt.text | markdownify }}
+                                    {{ prompt.text | strip | replace: "\n\n", " " | replace: "\n", " " }}
                                 </div>
                                 
                                 {% if prompt.explanation %}
@@ -92,6 +92,9 @@ layout: default
                 </div>
             </div>
         </section>
+        
+        <!-- Section Divider -->
+        <div class="section-divider"></div>
 
         <!-- Tips Section -->
         {% if page.tips %}
@@ -108,11 +111,14 @@ layout: default
                     {% endfor %}
                 </div>
             </section>
+            
+            <!-- Section Divider -->
+            <div class="section-divider"></div>
         {% endif %}
 
-        <!-- Related Prompts -->
+        <!-- Recommendations Section -->
         {% if page.categories %}
-            <section id="recommendations" class="related-prompts">
+            <section id="recommendations" class="recommendations-section">
                 <h2>Recommendations</h2>
                 <div class="related-prompts-grid">
                     {% assign related_prompts = site.prompts | where_exp: "prompt", "prompt.categories contains page.categories.first" | where_exp: "prompt", "prompt.url != page.url" | limit: 6 %}

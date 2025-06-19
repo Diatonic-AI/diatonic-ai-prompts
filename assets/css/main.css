@@ -479,18 +479,10 @@ a:hover {
     border-radius: var(--radius-md);
     border-left: 4px solid var(--primary-color);
     font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
-    line-height: 1.5;
+    line-height: 1.6;
     word-wrap: break-word;
     font-size: 0.875rem;
-}
-
-.prompt-text p {
-    margin-bottom: 0.75rem;
-    line-height: 1.5;
-}
-
-.prompt-text p:last-child {
-    margin-bottom: 0;
+    white-space: pre-wrap;
 }
 
 /* Placeholder Highlighting */
@@ -589,12 +581,31 @@ a:hover {
     margin: 0;
 }
 
-/* Related Prompts */
-.related-prompts {
+/* Section Dividers */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+    margin: 4rem 0;
+    position: relative;
+}
+
+.section-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 1px;
+    background: var(--primary-color);
+}
+
+/* Recommendations Section */
+.recommendations-section {
     margin-bottom: 3rem;
 }
 
-.related-prompts h2 {
+.recommendations-section h2 {
     margin-bottom: 2rem;
     text-align: center;
 }
