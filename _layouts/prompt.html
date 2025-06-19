@@ -228,16 +228,27 @@ function setupPageNavigation() {
             const targetElement = document.getElementById(targetId);
             
             if (targetElement) {
-                // Calculate offset for sticky headers
-                const headerHeight = document.querySelector('.site-header')?.offsetHeight || 60;
-                const navHeight = document.querySelector('.page-navigation')?.offsetHeight || 80;
-                const totalOffset = headerHeight + navHeight + 20; // Extra 20px for breathing room
+                // More precise offset calculation
+                const siteHeader = document.querySelector('.site-header');
+                const pageNav = document.querySelector('.page-navigation');
                 
-                // Get target position and scroll to it with offset
-                const targetPosition = targetElement.offsetTop - totalOffset;
+                let totalOffset = 0;
+                
+                if (siteHeader) {
+                    totalOffset += siteHeader.getBoundingClientRect().height;
+                }
+                if (pageNav) {
+                    totalOffset += pageNav.getBoundingClientRect().height;
+                }
+                
+                // Add extra margin for perfect positioning
+                totalOffset += 30;
+                
+                // Get target position and scroll to it with precise offset
+                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - totalOffset;
                 
                 window.scrollTo({
-                    top: targetPosition,
+                    top: Math.max(0, targetPosition),
                     behavior: 'smooth'
                 });
                 
@@ -254,15 +265,25 @@ function setupScrollSpy() {
     const navLinks = document.querySelectorAll('.page-nav-link');
     
     function updateActiveNav() {
-        // Calculate offset for sticky headers (same as navigation function)
-        const headerHeight = document.querySelector('.site-header')?.offsetHeight || 60;
-        const navHeight = document.querySelector('.page-navigation')?.offsetHeight || 80;
-        const totalOffset = headerHeight + navHeight + 50; // Extra 50px for better detection
+        // Use the same precise offset calculation as navigation
+        const siteHeader = document.querySelector('.site-header');
+        const pageNav = document.querySelector('.page-navigation');
+        
+        let totalOffset = 0;
+        
+        if (siteHeader) {
+            totalOffset += siteHeader.getBoundingClientRect().height;
+        }
+        if (pageNav) {
+            totalOffset += pageNav.getBoundingClientRect().height;
+        }
+        
+        // Add margin for better detection threshold
+        totalOffset += 100;
         
         let current = '';
         sections.forEach(function(section) {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
+            const sectionTop = section.getBoundingClientRect().top + window.pageYOffset;
             if (window.pageYOffset >= sectionTop - totalOffset) {
                 current = section.getAttribute('id');
             }
