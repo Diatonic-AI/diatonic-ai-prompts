@@ -45,46 +45,53 @@ layout: default
             </div>
         </nav>
 
-        <!-- Prompt Instructions -->
-        <section id="prompts" class="prompt-instructions">
-            <h2>Prompts</h2>
-            <p class="instructions-text">Copy a prompt, replace placeholders with relevant text, and paste it into your AI chat interface for an efficient and streamlined experience powered by Diatonic AI.</p>
-        </section>
-
-        <!-- Prompt Content -->
-        <div class="prompt-content">
-            {% if page.prompts %}
-                {% for prompt in page.prompts %}
-                    <div class="prompt-item">
-                        <div class="prompt-header-row">
-                            <h3 class="prompt-number">Prompt #{{ forloop.index }}</h3>
-                            <button class="copy-btn" data-prompt-id="{{ forloop.index }}" onclick="copyPrompt(this)">
-                                <i class="fas fa-copy"></i>
-                                Copy
-                            </button>
-                        </div>
-                        
-                        <div class="prompt-text" id="prompt-{{ forloop.index }}">
-                            {{ prompt.text | markdownify }}
-                        </div>
-                        
-                        {% if prompt.explanation %}
-                            <div class="prompt-explanation">
-                                <h4>Explanation and example</h4>
-                                <p>{{ prompt.explanation }}</p>
-                            </div>
-                        {% endif %}
+        <!-- Prompts Section with 2-Column Layout -->
+        <section id="prompts" class="prompts-section">
+            <div class="prompts-container">
+                <!-- Left Column: Instructions (40%) -->
+                <div class="prompts-instructions-column">
+                    <div class="instructions-container">
+                        <h2>Prompts</h2>
+                        <p class="instructions-text">Copy a prompt, replace placeholders with relevant text, and paste it into your AI chat interface for an efficient and streamlined experience powered by Diatonic AI.</p>
                     </div>
-                {% endfor %}
-            {% endif %}
-
-            <!-- Additional Content from Page Content -->
-            {% if content %}
-                <div class="additional-content">
-                    {{ content }}
                 </div>
-            {% endif %}
-        </div>
+                
+                <!-- Right Column: Prompt Content (60%) -->
+                <div class="prompts-content-column">
+                    {% if page.prompts %}
+                        {% for prompt in page.prompts %}
+                            <div class="prompt-item">
+                                <div class="prompt-header-row">
+                                    <h3 class="prompt-number">Prompt #{{ forloop.index }}</h3>
+                                    <button class="copy-btn" data-prompt-id="{{ forloop.index }}" onclick="copyPrompt(this)">
+                                        <i class="fas fa-copy"></i>
+                                        Copy
+                                    </button>
+                                </div>
+                                
+                                <div class="prompt-text" id="prompt-{{ forloop.index }}">
+                                    {{ prompt.text | markdownify }}
+                                </div>
+                                
+                                {% if prompt.explanation %}
+                                    <div class="prompt-explanation">
+                                        <h4>Explanation and example</h4>
+                                        <p>{{ prompt.explanation }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <!-- Additional Content from Page Content -->
+                    {% if content %}
+                        <div class="additional-content">
+                            {{ content }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
 
         <!-- Tips Section -->
         {% if page.tips %}

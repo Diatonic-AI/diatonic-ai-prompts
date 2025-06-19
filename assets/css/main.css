@@ -343,13 +343,13 @@ a:hover {
 
 .prompt-header {
     margin-bottom: 3rem;
-    text-align: center;
+    text-align: left;
 }
 
 .prompt-title {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.75rem;
     margin-bottom: 1rem;
 }
@@ -361,7 +361,7 @@ a:hover {
 .prompt-categories {
     display: flex;
     gap: 0.5rem;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
     margin-top: 1rem;
 }
@@ -378,31 +378,54 @@ a:hover {
 .prompt-description {
     font-size: 1.125rem;
     color: var(--text-secondary);
-    max-width: 600px;
-    margin: 0 auto;
+    margin: 0;
+    text-align: left;
 }
 
-/* Prompt Instructions */
-.prompt-instructions {
+/* Prompts Section Layout */
+.prompts-section {
+    margin-bottom: 3rem;
+}
+
+.prompts-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+/* Left Column - Instructions (40%) */
+.prompts-instructions-column {
+    flex: 0 0 40%;
+    position: sticky;
+    top: 140px;
+}
+
+.instructions-container {
     background: var(--surface-color);
     padding: 2rem;
     border-radius: var(--radius-lg);
-    margin-bottom: 3rem;
-    text-align: center;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
 }
 
-.prompt-instructions h2 {
+.instructions-container h2 {
     margin-bottom: 1rem;
+    text-align: left;
+    color: var(--text-primary);
 }
 
 .instructions-text {
-    font-size: 1.125rem;
+    font-size: 1rem;
     margin: 0;
+    text-align: left;
+    line-height: 1.6;
+    color: var(--text-secondary);
 }
 
-/* Prompt Content */
-.prompt-content {
-    margin-bottom: 3rem;
+/* Right Column - Prompt Content (60%) */
+.prompts-content-column {
+    flex: 1;
+    min-width: 0;
 }
 
 .prompt-item {
@@ -456,9 +479,18 @@ a:hover {
     border-radius: var(--radius-md);
     border-left: 4px solid var(--primary-color);
     font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
-    line-height: 1.6;
-    white-space: pre-wrap;
+    line-height: 1.5;
     word-wrap: break-word;
+    font-size: 0.875rem;
+}
+
+.prompt-text p {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+.prompt-text p:last-child {
+    margin-bottom: 0;
 }
 
 /* Placeholder Highlighting */
@@ -1004,6 +1036,30 @@ a:hover {
     .page-navigation {
         top: 60px;
         padding: 0.75rem 0;
+    }
+    
+    /* 2-Column Layout Mobile */
+    .prompts-container {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .prompts-instructions-column {
+        flex: none;
+        position: static;
+        order: 1;
+    }
+    
+    .prompts-content-column {
+        order: 2;
+    }
+    
+    .instructions-container {
+        padding: 1.5rem;
+    }
+    
+    .prompt-page {
+        max-width: 100%;
     }
 }
 
