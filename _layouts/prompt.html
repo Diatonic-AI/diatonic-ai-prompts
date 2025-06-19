@@ -70,7 +70,7 @@ layout: default
                                 </div>
                                 
                                 <div class="prompt-text" id="prompt-{{ forloop.index }}">
-                                    {{ prompt.text | strip | replace: "\n\n", " " | replace: "\n", " " }}
+                                    {{- prompt.text | strip | replace: "\n\n", " " | replace: "\n", " " | replace: "    ", " " | replace: "  ", " " -}}
                                 </div>
                                 
                                 {% if prompt.explanation %}
