@@ -1,8 +1,8 @@
 # Prompt Library Website Configuration
 title: "Sintra AI Prompts"
 description: "Comprehensive collection of ChatGPT prompts for various industries and use cases"
-baseurl: ""
-url: "https://yourusername.github.io"
+baseurl: "/sintra-ai-prompts"
+url: "https://diatonic-ai.github.io"
 
 # Build settings
 markdown: kramdown
@@ -41,9 +41,9 @@ defaults:
       layout: "post"
 
 # Site settings
-email: your-email@domain.com
-github_username: yourusername
-twitter_username: yourusername
+email: contact@diatonic-ai.com
+github_username: Diatonic-AI
+twitter_username: diatonic_ai
 
 # Navigation
 navigation:

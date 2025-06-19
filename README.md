@@ -48,8 +48,8 @@ A comprehensive prompt library website built with Jekyll and GitHub Pages. This 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/prompt-library.git
-   cd prompt-library
+   git clone https://github.com/Diatonic-AI/sintra-ai-prompts.git
+   cd sintra-ai-prompts
    ```
 
 2. **Install dependencies**
@@ -63,7 +63,7 @@ A comprehensive prompt library website built with Jekyll and GitHub Pages. This 
    ```
 
 4. **Open your browser**
-   Navigate to `http://localhost:4000`
+   Navigate to `http://localhost:4000/sintra-ai-prompts`
 
 ### Adding New Prompts
 
@@ -124,16 +124,10 @@ Edit `_config.yml` to customize:
 
 1. **Create a GitHub repository**
 2. **Push your code to the repository**
-3. **Enable GitHub Pages**
-   - Go to repository Settings
-   - Scroll to Pages section
-   - Select "Deploy from a branch"
-   - Choose "main" branch and "/ (root)" folder
-   - Click Save
-
-4. **Configure your domain** (optional)
-   - Add a CNAME file with your custom domain
-   - Update DNS settings to point to GitHub Pages
+3. **GitHub Pages is already enabled**
+   - The site is automatically deployed via GitHub Actions
+   - Live site: https://diatonic-ai.github.io/sintra-ai-prompts
+   - Deployment happens automatically on push to main branch
 
 ### Manual Deployment
 
@@ -193,7 +187,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 For questions or support, please:
 - Open an issue on GitHub
-- Contact us at your-email@domain.com
+- Contact us at contact@diatonic-ai.com
 
 ## Roadmap
 
