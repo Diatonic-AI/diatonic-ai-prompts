@@ -11,7 +11,7 @@ description: "Comprehensive collection of AI prompts for various industries and 
         <p>Comprehensive collection of AI prompts for various industries and use cases. Copy a prompt, replace placeholders with relevant text, and experience the power of AI-driven productivity with Diatonic AI's curated prompt library.</p>
         
         <div class="hero-cta">
-            <a href="/prompts/" class="btn btn-primary">
+            <a href="{{ "/prompts/" | relative_url }}" class="btn btn-primary">
                 <i class="fas fa-search"></i>
                 Browse All Prompts
             </a>
@@ -73,7 +73,7 @@ description: "Comprehensive collection of AI prompts for various industries and 
         </div>
         
         <div style="text-align: center; margin-top: 2rem;">
-            <a href="/prompts/" class="btn btn-primary">
+            <a href="{{ "/prompts/" | relative_url }}" class="btn btn-primary">
                 View All Prompts
                 <i class="fas fa-arrow-right"></i>
             </a>
@@ -87,7 +87,7 @@ description: "Comprehensive collection of AI prompts for various industries and 
         <h2 style="text-align: center; margin-bottom: 3rem;">Diatonic AI Packs</h2>
         <div class="prompts-grid">
             {% for pack in site.packs limit: 12 %}
-                <a href="/pack/{{ pack.slug }}/" class="prompt-card">
+                <a href="{{ "/pack/" | relative_url }}{{ pack.slug }}/" class="prompt-card">
                     <div class="prompt-card-header">
                         <span class="prompt-card-icon">{{ pack.icon }}</span>
                         <h3 class="prompt-card-title">{{ pack.name }}</h3>

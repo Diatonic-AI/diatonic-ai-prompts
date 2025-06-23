@@ -1,0 +1,52 @@
+# Working Development Configuration
+title: "Diatonic AI Prompts"
+description: "Comprehensive collection of AI prompts for various industries and use cases."
+baseurl: "/diatonic-ai-prompts"
+url: "http://localhost:4000"
+
+# Use redcarpet which is available
+markdown: redcarpet
+highlighter: rouge
+
+# No plugins
+plugins: []
+
+# Collections
+collections:
+  prompts:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "prompts"
+    values:
+      layout: "prompt"
+
+# Site settings
+email: contact@diatonic-ai.com
+github_username: Diatonic-AI
+
+# Basic navigation
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "Prompts"
+    url: "/prompts/"
+
+# Simple categories
+categories:
+  - name: "All"
+    slug: "all"
+  - name: "Business"
+    slug: "business"
+  - name: "Marketing"
+    slug: "marketing"
+
+# Exclude
+exclude:
+  - Gemfile*
+  - "*.sh"
+  - README.md

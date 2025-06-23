@@ -1,0 +1,25 @@
+title: "Diatonic AI Prompts"
+description: "AI Prompts Collection"
+baseurl: "/diatonic-ai-prompts"
+url: "http://localhost:4000"
+
+markdown: kramdown
+highlighter: rouge
+plugins: []
+
+collections:
+  prompts:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+      type: "prompts"
+    values:
+      layout: "prompt"
+
+exclude:
+  - Gemfile*
+  - "*.sh"
+  - README.md
+  - "_test_site"

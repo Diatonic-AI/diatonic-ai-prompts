@@ -7,8 +7,8 @@ layout: default
         <!-- Breadcrumb -->
         <nav class="breadcrumb" aria-label="breadcrumb">
             <ol class="breadcrumb-list">
-                <li class="breadcrumb-item"><a href="{{ "/" | relative_url }}">Home</a></li>
-                <li class="breadcrumb-item"><a href="{{ "/prompts/" | relative_url }}">Prompts</a></li>
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/prompts/">Prompts</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ page.title }}</li>
             </ol>
         </nav>
@@ -123,7 +123,7 @@ layout: default
                 <div class="related-prompts-grid">
                     {% assign related_prompts = site.prompts | where_exp: "prompt", "prompt.categories contains page.categories.first" | where_exp: "prompt", "prompt.url != page.url" | limit: 6 %}
                     {% for related_prompt in related_prompts %}
-                        <a href="{{ related_prompt.url | relative_url }}" class="related-prompt-card">
+                        <a href="{{ related_prompt.url }}" class="related-prompt-card">
                             {% if related_prompt.icon %}
                                 <span class="related-prompt-icon">{{ related_prompt.icon }}</span>
                             {% endif %}
@@ -207,7 +207,7 @@ function highlightPlaceholders() {
         html = html.replace(/&lt;([^&]+)&gt;/g, '<span class="placeholder placeholder-orange">&lt;$1&gt;</span>');
         
         // {{placeholder}} - purple
-        html = html.replace(/\{\{([^}]+)\}\}/g, '<span class="placeholder placeholder-purple">$1</span>');
+        html = html.replace(/\{\{([^}]+)\}\}/g, '<span class="placeholder placeholder-purple">{{$1}}</span>');
         
         // (your_placeholder) - teal
         html = html.replace(/\(your_([^)]+)\)/g, '<span class="placeholder placeholder-teal">(your_$1)</span>');

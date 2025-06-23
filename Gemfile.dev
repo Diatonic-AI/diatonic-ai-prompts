@@ -1,0 +1,13 @@
+source "https://rubygems.org"
+
+# Core Jekyll
+gem "jekyll", "~> 4.3.0"
+
+# Essential plugins that work without compilation
+gem "jekyll-sitemap"
+
+# Markdown processor
+gem "kramdown-parser-gfm"
+
+# Development gems
+gem "webrick", "~> 1.7"

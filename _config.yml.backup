@@ -20,11 +20,12 @@ collections:
     output: true
     permalink: /:collection/:name/
   categories:
-    output: true
-    permalink: /category/:name/
+
   packs:
     output: true
     permalink: /pack/:name/
+    output: true
+    permalink: /category/:name/
 
 # Defaults
 defaults:

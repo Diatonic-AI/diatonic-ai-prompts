@@ -1,0 +1,63 @@
+# Simple Development Configuration for WSL2 Debian
+title: "Diatonic AI Prompts"
+description: "Comprehensive collection of AI prompts for various industries and use cases. Powered by Diatonic AI's expertise in artificial intelligence."
+baseurl: "/diatonic-ai-prompts"
+url: "http://localhost:4000"
+
+# Build settings - using basic kramdown without GFM
+markdown: kramdown
+highlighter: rouge
+
+# No plugins to avoid conflicts
+plugins: []
+
+# Collections
+collections:
+  prompts:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "prompts"
+    values:
+      layout: "prompt"
+
+# Site settings
+email: contact@diatonic-ai.com
+github_username: Diatonic-AI
+twitter_username: diatonic_ai
+
+# Navigation
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "Prompts"
+    url: "/prompts/"
+  - title: "Categories"
+    url: "/categories/"
+
+# Categories (simplified for development)
+categories:
+  - name: "All"
+    slug: "all"
+  - name: "Business"
+    slug: "business"
+    icon: "💸"
+  - name: "Marketing"
+    slug: "marketing"
+    icon: "🤖"
+  - name: "Productivity"
+    slug: "productivity"
+    icon: "✔️"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/
+  - README.md
+  - "*.sh"

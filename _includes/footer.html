@@ -3,7 +3,7 @@
         <div class="footer-content">
             <!-- Footer Brand -->
             <div class="footer-brand">
-                <a href="/" class="footer-logo">
+                <a href="{{ "/" | relative_url }}" class="footer-logo">
                     <img src="/assets/images/logo.png" alt="{{ site.title }}" class="footer-logo-img">
                     <span class="footer-brand-text">{{ site.title }}</span>
                 </a>
@@ -16,7 +16,7 @@
                     <h4 class="footer-nav-title">Navigation</h4>
                     <ul class="footer-nav-list">
                         {% for nav_item in site.navigation %}
-                            <li><a href="{{ nav_item.url }}" class="footer-nav-link">{{ nav_item.title }}</a></li>
+                            <li><a href="{{ nav_item.url | relative_url }}" class="footer-nav-link">{{ nav_item.title }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -25,7 +25,7 @@
                     <h4 class="footer-nav-title">Categories</h4>
                     <ul class="footer-nav-list">
                         {% for category in site.categories limit: 6 %}
-                            <li><a href="/category/{{ category.slug }}/" class="footer-nav-link">{{ category.name }}</a></li>
+                            <li><a href="{{ "/category/" | relative_url }}{{ category.slug }}/" class="footer-nav-link">{{ category.name }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -34,7 +34,7 @@
                     <h4 class="footer-nav-title">Popular Packs</h4>
                     <ul class="footer-nav-list">
                         {% for pack in site.packs limit: 6 %}
-                            <li><a href="/pack/{{ pack.slug }}/" class="footer-nav-link">{{ pack.name }}</a></li>
+                            <li><a href="{{ "/pack/" | relative_url }}{{ pack.slug }}/" class="footer-nav-link">{{ pack.name }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -62,9 +62,9 @@
                     &copy; {{ 'now' | date: "%Y" }} {{ site.title }}. All rights reserved.
                 </p>
                 <div class="footer-links">
-                    <a href="/privacy/" class="footer-link">Privacy Policy</a>
-                    <a href="/terms/" class="footer-link">Terms of Service</a>
-                    <a href="/sitemap.xml" class="footer-link">Sitemap</a>
+                    <a href="{{ "/privacy/" | relative_url }}" class="footer-link">Privacy Policy</a>
+                    <a href="{{ "/terms/" | relative_url }}" class="footer-link">Terms of Service</a>
+                    <a href="{{ "/sitemap.xml" | relative_url }}" class="footer-link">Sitemap</a>
                 </div>
             </div>
         </div>

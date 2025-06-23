@@ -32,7 +32,7 @@ permalink: /prompts/
         <section class="prompts-section">
             <div class="prompts-grid">
                 {% for prompt in site.prompts %}
-                    <a href="{{ prompt.url }}" class="prompt-card" data-categories="{{ prompt.categories | join: ',' }}">
+                    <a href="{{ prompt.url | relative_url }}" class="prompt-card" data-categories="{{ prompt.categories | join: ',' }}">
                         <div class="prompt-card-header">
                             {% if prompt.icon %}
                                 <span class="prompt-card-icon">{{ prompt.icon }}</span>
