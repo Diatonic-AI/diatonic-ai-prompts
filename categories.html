@@ -20,7 +20,7 @@ permalink: /categories/
                 <h3>Categories</h3>
                 <ul class="category-list">
                     <li><a href="#" class="category-link active" data-category="all">All</a></li>
-                    {% for category in site.categories %}
+                    {% for category in site.data.categories %}
                         {% unless category.slug == 'all' %}
                             <li>
                                 <a href="#" class="category-link" data-category="{{ category.slug }}">
@@ -35,7 +35,7 @@ permalink: /categories/
                 <!-- Packs Section -->
                 <h3>Diatonic AI Packs</h3>
                 <ul class="pack-list">
-                    {% for pack in site.packs %}
+                    {% for pack in site.data.packs %}
                         <li>
                             <label class="pack-checkbox">
                                 <input type="checkbox" value="{{ pack.slug }}" class="pack-filter">
@@ -332,3 +332,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+6/23/2025 6:15:40 AM

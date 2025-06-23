@@ -28,7 +28,7 @@ description: "Comprehensive collection of AI prompts for various industries and 
     <div class="container">
         <h2>Categories</h2>
         <div class="category-grid">
-            {% for category in site.categories %}
+            {% for category in site.data.categories %}
                 <button class="category-btn" data-category="{{ category.slug }}" {% if category.slug == 'all' %}class="active"{% endif %}>
                     {% if category.icon %}
                         <span class="category-icon">{{ category.icon }}</span>
@@ -86,7 +86,7 @@ description: "Comprehensive collection of AI prompts for various industries and 
     <div class="container">
         <h2 style="text-align: center; margin-bottom: 3rem;">Diatonic AI Packs</h2>
         <div class="prompts-grid">
-            {% for pack in site.packs limit: 12 %}
+            {% for pack in site.data.packs limit: 12 %}
                 <a href="{{ "/pack/" | relative_url }}{{ pack.slug }}/" class="prompt-card">
                     <div class="prompt-card-header">
                         <span class="prompt-card-icon">{{ pack.icon }}</span>

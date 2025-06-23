@@ -1,0 +1,49 @@
+services:
+  jekyll:
+    # Development-specific overrides
+    environment:
+      - JEKYLL_ENV=development
+      - BUNDLE_PATH=/usr/local/bundle
+      - JEKYLL_LOG_LEVEL=debug
+    command: >
+      bash -c "
+        echo '🔧 DEVELOPMENT MODE' &&
+        echo '==================' &&
+        echo '' &&
+        echo 'Installing dependencies...' &&
+        bundle install &&
+        echo '' &&
+        echo 'Checking Jekyll configuration...' &&
+        bundle exec jekyll doctor &&
+        echo '' &&
+        echo '🚀 Starting development server...' &&
+        echo '' &&
+        echo '📍 Access your site at:' &&
+        echo '   http://localhost:4000/diatonic-ai-prompts/' &&
+        echo '' &&
+        echo '⚡ Features enabled:' &&
+        echo '   - Live reload (port 35729)' &&
+        echo '   - Incremental builds' &&
+        echo '   - Draft posts' &&
+        echo '   - Verbose logging' &&
+        echo '   - Force polling (Windows compatibility)' &&
+        echo '' &&
+        echo 'Press Ctrl+C to stop the server' &&
+        echo '================================' &&
+        echo '' &&
+        bundle exec jekyll serve 
+          --host 0.0.0.0 
+          --port 4000 
+          --livereload 
+          --livereload-port 35729 
+          --incremental 
+          --force_polling 
+          --verbose 
+          --drafts 
+          --trace
+      "
+    # Mount additional development files
+    volumes:
+      - .:/srv/jekyll:cached
+      - jekyll_bundle:/usr/local/bundle
+      - ./logs:/srv/jekyll/logs  # For Jekyll logs

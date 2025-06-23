@@ -1,0 +1,40 @@
+---
+# YAML Linting Configuration for Jekyll Site
+# This configuration ensures consistent YAML formatting across the project
+
+extends: default
+
+rules:
+  # Allow longer lines for descriptions and content
+  line-length:
+    max: 120
+    level: warning
+  
+  # Allow indentation variations for Jekyll frontmatter
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+  
+  # Allow empty values for optional fields
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: false
+  
+  # Allow truthy values like 'yes', 'no', 'on', 'off'
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no', 'on', 'off']
+    check-keys: false
+  
+  # Allow document start markers to be optional
+  document-start:
+    present: false
+  
+  # Allow comments to start at any column
+  comments:
+    min-spaces-from-content: 1
+    min-spaces-from-content: 1
+  
+  # Allow trailing spaces for markdown content
+  trailing-spaces:
+    level: warning

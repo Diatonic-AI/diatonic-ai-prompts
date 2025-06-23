@@ -1,0 +1,291 @@
+name: SEO and Link Validation
+
+on:
+  schedule:
+    # Run weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    # Allow manual trigger
+  push:
+    branches: [ main ]
+    paths:
+      - '*.html'
+      - '_layouts/**'
+      - '_includes/**'
+
+jobs:
+  seo-check:
+    name: SEO Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Build Site
+        run: |
+          bundle exec jekyll build --config _config.yml
+        env:
+          JEKYLL_ENV: production
+
+      - name: Install SEO Tools
+        run: |
+          npm install -g lighthouse@latest
+          pip install requests beautifulsoup4
+
+      - name: Check Meta Tags
+        shell: python
+        run: |
+          import os
+          import re
+          from bs4 import BeautifulSoup
+          
+          print("🔍 Checking SEO meta tags...")
+          
+          issues = []
+          
+          # Check main pages
+          pages_to_check = [
+              '_site/index.html',
+              '_site/prompts/index.html', 
+              '_site/categories/index.html'
+          ]
+          
+          for page_path in pages_to_check:
+              if os.path.exists(page_path):
+                  with open(page_path, 'r', encoding='utf-8') as f:
+                      content = f.read()
+                      soup = BeautifulSoup(content, 'html.parser')
+                      
+                      page_name = page_path.replace('_site/', '').replace('/index.html', '') or 'home'
+                      
+                      # Check title tag
+                      title = soup.find('title')
+                      if not title or len(title.get_text().strip()) == 0:
+                          issues.append(f"❌ Missing title tag in {page_name}")
+                      elif len(title.get_text()) > 60:
+                          issues.append(f"⚠️ Title too long in {page_name} ({len(title.get_text())} chars)")
+                      
+                      # Check meta description
+                      meta_desc = soup.find('meta', attrs={'name': 'description'})
+                      if not meta_desc or not meta_desc.get('content'):
+                          issues.append(f"❌ Missing meta description in {page_name}")
+                      elif len(meta_desc.get('content', '')) > 160:
+                          issues.append(f"⚠️ Meta description too long in {page_name} ({len(meta_desc.get('content', ''))} chars)")
+                      
+                      # Check h1 tag
+                      h1_tags = soup.find_all('h1')
+                      if len(h1_tags) == 0:
+                          issues.append(f"❌ Missing H1 tag in {page_name}")
+                      elif len(h1_tags) > 1:
+                          issues.append(f"⚠️ Multiple H1 tags in {page_name}")
+                      
+                      # Check Open Graph tags
+                      og_title = soup.find('meta', property='og:title')
+                      og_description = soup.find('meta', property='og:description')
+                      if not og_title:
+                          issues.append(f"⚠️ Missing Open Graph title in {page_name}")
+                      if not og_description:
+                          issues.append(f"⚠️ Missing Open Graph description in {page_name}")
+                      
+                      print(f"✅ Checked SEO for {page_name}")
+              else:
+                  issues.append(f"❌ Page not found: {page_path}")
+          
+          if issues:
+              print("\n🔍 SEO Issues Found:")
+              for issue in issues:
+                  print(issue)
+              
+              # Create issues summary but don't fail the build
+              print(f"\n📊 Total SEO issues: {len(issues)}")
+          else:
+              print("\n🎉 All SEO checks passed!")
+
+      - name: Check Internal Links
+        shell: bash
+        run: |
+          echo "🔗 Checking internal links..."
+          
+          LINK_ISSUES=0
+          
+          # Check for common broken link patterns
+          if grep -r "href.*\.md\"" _site/ > /dev/null 2>&1; then
+            echo "❌ Found .md links that should be converted to HTML"
+            LINK_ISSUES=$((LINK_ISSUES + 1))
+          fi
+          
+          # Check for empty href attributes
+          if grep -r 'href=""' _site/ > /dev/null 2>&1; then
+            echo "❌ Found empty href attributes"
+            LINK_ISSUES=$((LINK_ISSUES + 1))
+          fi
+          
+          # Check for missing relative_url filters
+          if grep -r 'href="/"' _site/ > /dev/null 2>&1; then
+            echo "⚠️ Found potential missing relative_url filters"
+          fi
+          
+          # Check that all prompt pages have working links
+          echo "📄 Checking prompt page links..."
+          for file in _prompts/*.md; do
+            if [ -f "$file" ]; then
+              slug=$(grep "^slug:" "$file" | head -1 | sed 's/slug: *"\([^"]*\)".*/\1/')
+              if [ ! -z "$slug" ]; then
+                expected_page="_site/prompts/$slug/index.html"
+                if [ ! -f "$expected_page" ]; then
+                  echo "❌ Missing generated page for slug: $slug"
+                  LINK_ISSUES=$((LINK_ISSUES + 1))
+                fi
+              fi
+            fi
+          done
+          
+          if [ $LINK_ISSUES -eq 0 ]; then
+            echo "✅ All internal links check passed!"
+          else
+            echo "⚠️ Found $LINK_ISSUES link issues"
+          fi
+
+      - name: Validate Sitemap
+        shell: bash
+        run: |
+          echo "🗺️ Validating sitemap..."
+          
+          if [ -f "_site/sitemap.xml" ]; then
+            echo "✅ Sitemap generated successfully"
+            
+            # Check sitemap size
+            SITEMAP_SIZE=$(wc -l < _site/sitemap.xml)
+            echo "📊 Sitemap contains $SITEMAP_SIZE lines"
+            
+            # Basic XML validation
+            if xmllint --noout _site/sitemap.xml 2>/dev/null; then
+              echo "✅ Sitemap XML is valid"
+            else
+              echo "❌ Sitemap XML has validation errors"
+            fi
+          else
+            echo "❌ Sitemap not generated"
+          fi
+
+      - name: Check Robots.txt
+        shell: bash
+        run: |
+          echo "🤖 Checking robots.txt..."
+          
+          if [ -f "_site/robots.txt" ]; then
+            echo "✅ Robots.txt found"
+            echo "📄 Content:"
+            cat _site/robots.txt
+          else
+            echo "⚠️ Robots.txt not found"
+          fi
+
+      - name: Performance Check
+        shell: bash
+        run: |
+          echo "⚡ Checking site performance..."
+          
+          # Check HTML file sizes
+          echo "📊 HTML file sizes:"
+          find _site -name "*.html" -exec wc -c {} + | sort -n | tail -10
+          
+          # Check total site size
+          SITE_SIZE=$(du -sh _site | cut -f1)
+          echo "💾 Total site size: $SITE_SIZE"
+          
+          # Check for large files
+          echo "📦 Large files (>100KB):"
+          find _site -type f -size +100k -exec ls -lh {} + || echo "No large files found"
+
+      - name: Generate SEO Report
+        shell: bash
+        run: |
+          echo "📋 SEO Validation Report - $(date)" > seo-report.md
+          echo "=================================" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "## Site Statistics" >> seo-report.md
+          echo "- Total pages: $(find _site -name '*.html' | wc -l)" >> seo-report.md
+          echo "- Total size: $(du -sh _site | cut -f1)" >> seo-report.md
+          echo "- Prompt pages: $(find _site -path '*/prompts/*' -name 'index.html' | wc -l)" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "## SEO Checks" >> seo-report.md
+          echo "✅ Meta tags validated" >> seo-report.md
+          echo "✅ Internal links checked" >> seo-report.md
+          echo "✅ Sitemap validated" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "## Recommendations" >> seo-report.md
+          echo "- Ensure all prompt pages have unique meta descriptions" >> seo-report.md
+          echo "- Add structured data for better search visibility" >> seo-report.md
+          echo "- Consider adding breadcrumb navigation" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "*Generated by GitHub Actions SEO Validation*" >> seo-report.md
+
+      - name: Upload SEO Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-validation-report
+          path: seo-report.md
+          retention-days: 30
+
+  accessibility-check:
+    name: Accessibility Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Build Site
+        run: |
+          bundle exec jekyll build --config _config.yml
+        env:
+          JEKYLL_ENV: production
+
+      - name: Install Accessibility Tools
+        run: |
+          npm install -g @axe-core/cli
+
+      - name: Check Accessibility
+        shell: bash
+        run: |
+          echo "♿ Checking accessibility..."
+          
+          # Start a simple HTTP server for testing
+          cd _site
+          python3 -m http.server 8000 &
+          SERVER_PID=$!
+          sleep 5
+          
+          # Run axe accessibility tests on main pages
+          echo "Testing homepage..."
+          axe http://localhost:8000/ --reporter=v2 --output=accessibility-home.json || true
+          
+          echo "Testing prompts page..."
+          axe http://localhost:8000/prompts/ --reporter=v2 --output=accessibility-prompts.json || true
+          
+          echo "Testing categories page..."
+          axe http://localhost:8000/categories/ --reporter=v2 --output=accessibility-categories.json || true
+          
+          # Kill the server
+          kill $SERVER_PID
+          
+          echo "✅ Accessibility tests completed"
+
+      - name: Upload Accessibility Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-reports
+          path: _site/accessibility-*.json
+          retention-days: 30

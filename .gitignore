@@ -66,3 +66,22 @@ Thumbs.db
 # Windows
 Desktop.ini
 
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# PowerShell
+*.ps1.log
+
+# Additional Jekyll
+.jekyll-cache/
+.jekyll-metadata
+
+# GitHub Actions
+.github/workflows/.secrets
+

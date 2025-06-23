@@ -17,7 +17,7 @@ permalink: /prompts/
         <section class="category-filter">
             <h2>Filter by Category</h2>
             <div class="category-grid">
-                {% for category in site.categories %}
+                {% for category in site.data.categories %}
                     <button class="category-btn" data-category="{{ category.slug }}" {% if category.slug == 'all' %}class="active"{% endif %}>
                         {% if category.icon %}
                             <span class="category-icon">{{ category.icon }}</span>

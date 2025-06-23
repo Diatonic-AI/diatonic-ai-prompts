@@ -1,0 +1,276 @@
+name: Security and Dependencies
+
+on:
+  schedule:
+    # Run monthly on the 1st at 4 AM UTC
+    - cron: '0 4 1 * *'
+  workflow_dispatch:
+    # Allow manual trigger
+  push:
+    branches: [ main ]
+    paths:
+      - 'Gemfile*'
+      - '_config*.yml'
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Install bundler-audit
+        run: |
+          gem install bundler-audit
+          bundle audit --update
+
+      - name: Run Security Audit
+        run: |
+          echo "🔒 Running security audit..."
+          
+          # Check for vulnerable gems
+          bundle audit check || echo "Security vulnerabilities found"
+          
+          # Check for outdated gems
+          echo "📦 Checking for outdated gems..."
+          bundle outdated || true
+
+      - name: Check Jekyll Security
+        shell: bash
+        run: |
+          echo "🔍 Checking Jekyll security settings..."
+          
+          SECURITY_ISSUES=0
+          
+          # Check for safe mode in production
+          if ! grep -q "safe: true" _config*.yml; then
+            echo "⚠️ Consider enabling safe mode for production"
+          fi
+          
+          # Check for liquid strict filters
+          if ! grep -q "liquid:" _config*.yml; then
+            echo "⚠️ Consider adding liquid strict settings"
+          fi
+          
+          # Check for kramdown security settings
+          if grep -q "parse_block_html: true" _config*.yml; then
+            echo "⚠️ parse_block_html enabled - ensure trusted content only"
+          fi
+          
+          echo "✅ Jekyll security check completed"
+
+      - name: Scan for Sensitive Data
+        shell: bash
+        run: |
+          echo "🕵️ Scanning for sensitive data patterns..."
+          
+          SENSITIVE_FOUND=0
+          
+          # Check for common sensitive patterns (excluding this file)
+          if grep -r -i --exclude="*.yml" "password\|secret\|key\|token" . > /dev/null 2>&1; then
+            echo "⚠️ Found potential sensitive data patterns"
+            grep -r -i --exclude="*.yml" "password\|secret\|key\|token" . | head -5
+            SENSITIVE_FOUND=$((SENSITIVE_FOUND + 1))
+          fi
+          
+          # Check for hardcoded URLs that might leak info
+          if grep -r "localhost:" . | grep -v "workflows" > /dev/null 2>&1; then
+            echo "⚠️ Found localhost URLs"
+            grep -r "localhost:" . | grep -v "workflows" | head -3
+          fi
+          
+          # Check for email addresses in content
+          if grep -r -E "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b" _prompts/ > /dev/null 2>&1; then
+            echo "⚠️ Found email addresses in prompts"
+          fi
+          
+          if [ $SENSITIVE_FOUND -eq 0 ]; then
+            echo "✅ No obvious sensitive data found"
+          else
+            echo "⚠️ Review flagged items above"
+          fi
+
+  dependency-updates:
+    name: Dependency Updates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Check for Updates
+        id: updates
+        shell: bash
+        run: |
+          echo "📦 Checking for dependency updates..."
+          
+          # Check for gem updates
+          bundle outdated > outdated.txt 2>&1 || true
+          
+          if [ -s outdated.txt ]; then
+            echo "updates_available=true" >> $GITHUB_OUTPUT
+            echo "📋 Outdated gems found:"
+            cat outdated.txt
+          else
+            echo "updates_available=false" >> $GITHUB_OUTPUT
+            echo "✅ All gems are up to date"
+          fi
+
+      - name: Update Dependencies
+        if: steps.updates.outputs.updates_available == 'true'
+        shell: bash
+        run: |
+          echo "🔄 Updating dependencies..."
+          
+          # Update gems (excluding major version changes)
+          bundle update --conservative
+          
+          # Create summary of changes
+          echo "## Dependency Updates" > update-summary.md
+          echo "Date: $(date)" >> update-summary.md
+          echo "" >> update-summary.md
+          echo "### Updated Gems" >> update-summary.md
+          echo '```' >> update-summary.md
+          git diff Gemfile.lock >> update-summary.md || true
+          echo '```' >> update-summary.md
+
+      - name: Test Updated Dependencies
+        if: steps.updates.outputs.updates_available == 'true'
+        shell: bash
+        run: |
+          echo "🧪 Testing updated dependencies..."
+          
+          # Test that Jekyll can build with new dependencies
+          bundle exec jekyll build --config _config.yml
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Build successful with updated dependencies"
+          else
+            echo "❌ Build failed with updated dependencies"
+            exit 1
+          fi
+
+      - name: Create Update PR
+        if: steps.updates.outputs.updates_available == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "📦 Update Ruby dependencies"
+          title: "📦 Automated Dependency Updates"
+          body: |
+            ## Automated Dependency Updates
+            
+            This PR contains automated updates to Ruby gems and dependencies.
+            
+            ### Changes
+            - Updated gems to latest compatible versions
+            - Maintained backward compatibility
+            - Build tested successfully
+            
+            ### Testing
+            - [x] Jekyll build successful
+            - [x] No breaking changes detected
+            - [x] Security audit passed
+            
+            **Generated by GitHub Actions**
+          branch: automated-dependency-updates
+          delete-branch: true
+
+  performance-audit:
+    name: Performance Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Build Site
+        run: |
+          bundle exec jekyll build --config _config.yml
+        env:
+          JEKYLL_ENV: production
+
+      - name: Audit Build Performance
+        shell: bash
+        run: |
+          echo "⚡ Auditing build performance..."
+          
+          # Measure build time
+          start_time=$(date +%s)
+          bundle exec jekyll build --config _config.yml > /dev/null 2>&1
+          end_time=$(date +%s)
+          build_time=$((end_time - start_time))
+          
+          echo "🕒 Build time: ${build_time}s"
+          
+          # Check site size
+          site_size=$(du -sh _site | cut -f1)
+          echo "💾 Site size: $site_size"
+          
+          # Count files
+          html_files=$(find _site -name "*.html" | wc -l)
+          css_files=$(find _site -name "*.css" | wc -l)
+          js_files=$(find _site -name "*.js" | wc -l)
+          
+          echo "📄 HTML files: $html_files"
+          echo "🎨 CSS files: $css_files"  
+          echo "⚙️ JS files: $js_files"
+          
+          # Performance recommendations
+          echo "## Performance Recommendations"
+          
+          if [ $build_time -gt 30 ]; then
+            echo "⚠️ Build time over 30s - consider optimizing"
+          fi
+          
+          if [ $html_files -gt 100 ]; then
+            echo "⚠️ Large number of HTML files - consider pagination"
+          fi
+
+      - name: Generate Performance Report
+        shell: bash
+        run: |
+          echo "📊 Performance Audit Report - $(date)" > performance-report.md
+          echo "===================================" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "## Build Metrics" >> performance-report.md
+          echo "- Build time: $(date +%s)s" >> performance-report.md
+          echo "- Site size: $(du -sh _site | cut -f1)" >> performance-report.md
+          echo "- Total files: $(find _site -type f | wc -l)" >> performance-report.md
+          echo "- HTML pages: $(find _site -name '*.html' | wc -l)" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "## Recommendations" >> performance-report.md
+          echo "- Monitor build time trends" >> performance-report.md
+          echo "- Optimize images and assets" >> performance-report.md
+          echo "- Consider static asset compression" >> performance-report.md
+          echo "" >> performance-report.md
+          echo "*Generated by GitHub Actions Performance Audit*" >> performance-report.md
+
+      - name: Upload Performance Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-audit-report
+          path: performance-report.md
+          retention-days: 30

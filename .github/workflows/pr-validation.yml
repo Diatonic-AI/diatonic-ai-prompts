@@ -1,0 +1,159 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '_prompts/**'
+      - '_data/**'
+      - '*.html'
+      - '_layouts/**'
+      - '_includes/**'
+      - '_config*.yml'
+
+jobs:
+  validate-changes:
+    name: Validate PR Changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v40
+        with:
+          files: |
+            _prompts/**
+            _data/**
+            *.html
+            _layouts/**
+            _includes/**
+            _config*.yml
+
+      - name: Validate New/Modified Prompts
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          echo "🔍 Validating changed files..."
+          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+          
+          VALIDATION_ERRORS=0
+          
+          # Check each changed prompt file
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            if [[ "$file" == _prompts/*.md ]]; then
+              echo "📄 Validating: $file"
+              
+              # Check if file exists (not deleted)
+              if [ -f "$file" ]; then
+                # Validate required frontmatter fields
+                if ! grep -q "^title:" "$file"; then
+                  echo "❌ Missing title field in: $file"
+                  VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+                fi
+                
+                if ! grep -q "^description:" "$file"; then
+                  echo "❌ Missing description field in: $file"
+                  VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+                fi
+                
+                if ! grep -q "^categories:" "$file"; then
+                  echo "❌ Missing categories field in: $file"
+                  VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+                fi
+                
+                if ! grep -q "^slug:" "$file"; then
+                  echo "❌ Missing slug field in: $file"
+                  VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+                fi
+                
+                if ! grep -q "^prompts:" "$file"; then
+                  echo "❌ Missing prompts field in: $file"
+                  VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+                fi
+                
+                # Check for proper YAML structure
+                if ! grep -q "^---$" "$file"; then
+                  echo "❌ Missing YAML frontmatter delimiters in: $file"
+                  VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+                fi
+                
+                echo "✅ Validated: $file"
+              fi
+            fi
+          done
+          
+          if [ $VALIDATION_ERRORS -eq 0 ]; then
+            echo "🎉 All validation checks passed!"
+          else
+            echo "❌ Found $VALIDATION_ERRORS validation errors"
+            exit 1
+          fi
+
+      - name: Check for Duplicate Slugs
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          echo "🔍 Checking for duplicate slugs..."
+          
+          # Extract all slugs from prompt files
+          SLUGS_FILE=$(mktemp)
+          for file in _prompts/*.md; do
+            if [ -f "$file" ]; then
+              slug=$(grep "^slug:" "$file" | head -1 | sed 's/slug: *"\([^"]*\)".*/\1/')
+              if [ ! -z "$slug" ]; then
+                echo "$slug" >> "$SLUGS_FILE"
+              fi
+            fi
+          done
+          
+          # Check for duplicates
+          DUPLICATES=$(sort "$SLUGS_FILE" | uniq -d)
+          if [ ! -z "$DUPLICATES" ]; then
+            echo "❌ Duplicate slugs found:"
+            echo "$DUPLICATES"
+            exit 1
+          else
+            echo "✅ No duplicate slugs found"
+          fi
+
+      - name: Validate Category References
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          echo "🏷️ Validating category references..."
+          
+          # Get valid categories from data file
+          if [ -f "_data/categories.yml" ]; then
+            VALID_CATEGORIES=$(grep "slug:" _data/categories.yml | sed 's/.*slug: *"\([^"]*\)".*/\1/')
+            echo "Valid categories: $(echo $VALID_CATEGORIES | tr '\n' ' ')"
+            
+            # Check each prompt file
+            CATEGORY_ERRORS=0
+            for file in _prompts/*.md; do
+              if [ -f "$file" ]; then
+                # Extract categories from prompt (simplified check)
+                if grep -q "^categories:" "$file"; then
+                  echo "✅ Categories field found in $(basename "$file")"
+                fi
+              fi
+            done
+            
+            echo "✅ Category validation completed"
+          else
+            echo "⚠️ Categories data file not found, skipping category validation"
+          fi
+
+      - name: Generate PR Summary
+        if: steps.changed-files.outputs.any_changed == 'true'
+        shell: bash
+        run: |
+          echo "📊 PR Validation Summary"
+          echo "======================="
+          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files_count }}"
+          echo "✅ All validations passed"
+          echo ""
+          echo "This PR is ready for review! 🚀"

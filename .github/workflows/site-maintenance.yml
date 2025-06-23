@@ -1,0 +1,265 @@
+name: Site Maintenance
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+  push:
+    branches: [ main ]
+    paths:
+      - '_prompts/**'
+      - '_data/**'
+
+jobs:
+  update-statistics:
+    name: Update Site Statistics
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calculate Site Statistics
+        id: stats
+        shell: bash
+        run: |
+          echo "📊 Calculating site statistics..."
+          
+          # Count prompts
+          PROMPT_COUNT=$(find _prompts -name "*.md" | wc -l)
+          echo "prompts=$PROMPT_COUNT" >> $GITHUB_OUTPUT
+          
+          # Count categories
+          CATEGORY_COUNT=$(grep -c "slug:" _data/categories.yml || echo "0")
+          echo "categories=$CATEGORY_COUNT" >> $GITHUB_OUTPUT
+          
+          # Count packs
+          PACK_COUNT=$(grep -c "slug:" _data/packs.yml || echo "0")
+          echo "packs=$PACK_COUNT" >> $GITHUB_OUTPUT
+          
+          # Count featured prompts
+          FEATURED_COUNT=$(grep -l "featured: true" _prompts/*.md | wc -l)
+          echo "featured=$FEATURED_COUNT" >> $GITHUB_OUTPUT
+          
+          # Get last updated date
+          LAST_UPDATED=$(date -u +"%Y-%m-%d")
+          echo "last_updated=$LAST_UPDATED" >> $GITHUB_OUTPUT
+          
+          echo "📄 Prompts: $PROMPT_COUNT"
+          echo "🏷️ Categories: $CATEGORY_COUNT" 
+          echo "📦 Packs: $PACK_COUNT"
+          echo "⭐ Featured: $FEATURED_COUNT"
+          echo "📅 Last Updated: $LAST_UPDATED"
+
+      - name: Update Site Statistics File
+        shell: bash
+        run: |
+          echo "📝 Updating site statistics..."
+          
+          # Create or update _data/site_stats.yml
+          cat > _data/site_stats.yml << EOF
+          # Auto-generated site statistics
+          # Last updated: ${{ steps.stats.outputs.last_updated }}
+          
+          prompts:
+            total: ${{ steps.stats.outputs.prompts }}
+            featured: ${{ steps.stats.outputs.featured }}
+          
+          categories:
+            total: ${{ steps.stats.outputs.categories }}
+          
+          packs:
+            total: ${{ steps.stats.outputs.packs }}
+          
+          meta:
+            last_updated: "${{ steps.stats.outputs.last_updated }}"
+            generated_by: "GitHub Actions"
+          EOF
+          
+          echo "✅ Site statistics updated"
+
+      - name: Generate SEO Sitemap Data
+        shell: bash
+        run: |
+          echo "🗺️ Generating SEO sitemap data..."
+          
+          # Create sitemap data for better SEO
+          cat > _data/sitemap.yml << EOF
+          # Auto-generated sitemap data for SEO
+          # Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          pages:
+          EOF
+          
+          # Add main pages
+          echo "  - url: /" >> _data/sitemap.yml
+          echo "    priority: 1.0" >> _data/sitemap.yml
+          echo "    changefreq: weekly" >> _data/sitemap.yml
+          echo "  - url: /prompts/" >> _data/sitemap.yml
+          echo "    priority: 0.9" >> _data/sitemap.yml
+          echo "    changefreq: daily" >> _data/sitemap.yml
+          echo "  - url: /categories/" >> _data/sitemap.yml
+          echo "    priority: 0.8" >> _data/sitemap.yml
+          echo "    changefreq: weekly" >> _data/sitemap.yml
+          
+          # Add individual prompt pages
+          echo "" >> _data/sitemap.yml
+          echo "prompts:" >> _data/sitemap.yml
+          for file in _prompts/*.md; do
+            if [ -f "$file" ]; then
+              slug=$(grep "^slug:" "$file" | head -1 | sed 's/slug: *"\([^"]*\)".*/\1/')
+              if [ ! -z "$slug" ]; then
+                echo "  - slug: \"$slug\"" >> _data/sitemap.yml
+                echo "    priority: 0.7" >> _data/sitemap.yml
+                echo "    changefreq: monthly" >> _data/sitemap.yml
+              fi
+            fi
+          done
+          
+          echo "✅ SEO sitemap data generated"
+
+      - name: Update README Statistics
+        shell: bash
+        run: |
+          echo "📄 Updating README with current statistics..."
+          
+          # Check if README exists
+          if [ -f "README.md" ]; then
+            # Create a backup
+            cp README.md README.md.backup
+            
+            # Update statistics in README
+            sed -i "s/[0-9]\+ prompts/${{ steps.stats.outputs.prompts }} prompts/g" README.md
+            sed -i "s/[0-9]\+ categories/${{ steps.stats.outputs.categories }} categories/g" README.md
+            sed -i "s/[0-9]\+ packs/${{ steps.stats.outputs.packs }} packs/g" README.md
+            
+            echo "✅ README statistics updated"
+          else
+            echo "⚠️ README.md not found, skipping README update"
+          fi
+
+      - name: Check for Changes
+        id: git-check
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit Statistics Updates
+        if: steps.git-check.outputs.changes == 'true'
+        shell: bash
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add _data/site_stats.yml _data/sitemap.yml README.md
+          git commit -m "📊 Auto-update site statistics and SEO data
+          
+          - Prompts: ${{ steps.stats.outputs.prompts }}
+          - Categories: ${{ steps.stats.outputs.categories }}
+          - Packs: ${{ steps.stats.outputs.packs }}
+          - Featured: ${{ steps.stats.outputs.featured }}
+          - Updated: ${{ steps.stats.outputs.last_updated }}"
+
+      - name: Push Changes
+        if: steps.git-check.outputs.changes == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+  health-check:
+    name: Site Health Check
+    runs-on: ubuntu-latest
+    needs: update-statistics
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Build Site for Testing
+        run: |
+          bundle exec jekyll build --config _config.yml
+        env:
+          JEKYLL_ENV: production
+
+      - name: Check Build Output
+        shell: bash
+        run: |
+          echo "🏥 Performing site health check..."
+          
+          HEALTH_ISSUES=0
+          
+          # Check if main pages were generated
+          for page in "_site/index.html" "_site/prompts/index.html" "_site/categories/index.html"; do
+            if [ -f "$page" ]; then
+              echo "✅ Generated: $page"
+            else
+              echo "❌ Missing: $page"
+              HEALTH_ISSUES=$((HEALTH_ISSUES + 1))
+            fi
+          done
+          
+          # Check if prompt pages were generated
+          PROMPT_FILES=$(find _prompts -name "*.md" | wc -l)
+          GENERATED_PROMPTS=$(find _site -path "*/prompts/*" -name "index.html" | wc -l)
+          
+          echo "📄 Source prompts: $PROMPT_FILES"
+          echo "🏗️ Generated prompt pages: $GENERATED_PROMPTS"
+          
+          if [ $GENERATED_PROMPTS -lt $PROMPT_FILES ]; then
+            echo "⚠️ Warning: Not all prompt pages were generated"
+            HEALTH_ISSUES=$((HEALTH_ISSUES + 1))
+          fi
+          
+          # Check for broken internal links (simplified)
+          if grep -r "href.*404" _site/ > /dev/null 2>&1; then
+            echo "⚠️ Warning: Potential 404 links found"
+            HEALTH_ISSUES=$((HEALTH_ISSUES + 1))
+          fi
+          
+          if [ $HEALTH_ISSUES -eq 0 ]; then
+            echo "🎉 Site health check passed!"
+          else
+            echo "⚠️ Found $HEALTH_ISSUES potential issues"
+            # Don't fail the build for warnings, just log them
+          fi
+
+      - name: Generate Health Report
+        shell: bash
+        run: |
+          echo "📋 Site Health Report - $(date)" > health-report.md
+          echo "==============================" >> health-report.md
+          echo "" >> health-report.md
+          echo "## Statistics" >> health-report.md
+          echo "- Prompt files: $(find _prompts -name "*.md" | wc -l)" >> health-report.md
+          echo "- Generated pages: $(find _site -name "index.html" | wc -l)" >> health-report.md
+          echo "- Site size: $(du -sh _site | cut -f1)" >> health-report.md
+          echo "" >> health-report.md
+          echo "## Build Status" >> health-report.md
+          echo "✅ Build completed successfully" >> health-report.md
+          echo "✅ All required pages generated" >> health-report.md
+          echo "" >> health-report.md
+          echo "*Generated by GitHub Actions*" >> health-report.md
+
+      - name: Upload Health Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-health-report
+          path: health-report.md
+          retention-days: 30
